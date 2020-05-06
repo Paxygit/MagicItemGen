@@ -12,9 +12,15 @@ Example:
 Currently working locally for magic tier items, with no Roll20 Macro Integration.
 
 -TODO: Rare item generation
+
 -TODO: Randomized Number of Affixes
+
 -TODO: Format posting nicely
+
 -TODO: Roll20 Integration 
+
 -TODO: Icons, Art
+
 -TODO: Release prep
+
 -TODO: Release?
