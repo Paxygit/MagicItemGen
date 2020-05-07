@@ -11,7 +11,7 @@ Example:
 
 Currently working locally for magic tier items, with no Roll20 Macro Integration.
 
--TODO: Rare item generation
+-TODO: Rare item generation DONE FOR WEAPONS 5/7/20
 
 xTODO: Randomized Number of Affixes DONE 5/6/20
 
