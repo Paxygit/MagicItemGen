@@ -13,8 +13,10 @@ namespace MagicItemGen
         static SheetsService service;
         static readonly string appName = "Fixes";
         static readonly string spreadsheetID = "1g7hTUbNkulh-Z63PMEo1-lR4B0Kw-rKX9uC54iGSVFw";
-        static readonly string sheetPrefix = "Prefix List";
-        static readonly string sheetSuffix = "Suffix List";
+        static readonly string sheetPrefixWeapon = "Prefix List Weapon";
+        static readonly string sheetSuffixWeapon = "Suffix List Weapon";
+        static readonly string sheetPrefixArmor = "Prefix List Armor";
+        static readonly string sheetSuffixArmor = "Suffix List Armor";
         static readonly string sheetWeapType = "Weapon List";
         static readonly string sheetDropRate = "DROPRATE TO CR";
         static readonly string fifthEditionWeaponCPDM = "https://roll20.net/compendium/dnd5e/Weapons#content";
@@ -43,6 +45,7 @@ namespace MagicItemGen
             var values = request.Execute().Values; //USE FOR VALUES
             var value = values[0]; // GEN THROUGH HERE
             #endregion
+
             string[] weaponType = GetWeaponType();
             int[] rarity = dropRarity(value);
             switch (rarity[0])
@@ -53,9 +56,9 @@ namespace MagicItemGen
                 case 2: // RARE
                     return GenerateRare(rarity[1], Convert.ToInt32(value[1]), weaponType);
 
-                case 0: // RARE
+                case 0: // NORMAL
                     Console.WriteLine("Normal");
-                    return "Normal " + weaponType;
+                    return "Normal " + weaponType[0];
             }
             return "ERROR GENERATING ITEM RARITY";
         }
@@ -156,13 +159,27 @@ namespace MagicItemGen
 
                 
             }
-            string rareName = "Temp Name, " + weaponType[0] + "\n\n";
+            string rareNameAffixes = GenerateRareName();
+            string rareName = rareNameAffixes + weaponType[0] + "\n\n";
             rareName = rareName + prefixOne[0] + ": " + prefixOne[1] + "\n\n";
             if (prefixTwo[0] != "") { rareName = rareName + prefixTwo[0] + ": " + prefixTwo[1] + "\n\n"; }
             rareName = rareName + suffixOne[0] + ": " + suffixOne[1] + "\n\n";
             if (suffixTwo[0] != "") { rareName = rareName + suffixTwo[0] + ": " + suffixTwo[1] + "\n\n"; }
 
             return rareName + weaponType[1];                                // + Link to Roll20 Weapon Compendium
+        }
+
+        private static string GenerateRareName()
+        {
+            var rangePrefix = $"{sheetPrefixWeapon}!C2:C41";//P
+            var rangeSuffix = $"{sheetSuffixWeapon}!C2:C41";//S
+            var requestPrefix = service.Spreadsheets.Values.Get(spreadsheetID, rangePrefix);//P
+            var requestSuffix = service.Spreadsheets.Values.Get(spreadsheetID, rangeSuffix);//S
+            var valuesPrefix = requestPrefix.Execute().Values; //P
+            var valuesSuffix = requestSuffix.Execute().Values; //S
+
+            //                          SEND GENERATED PREFIX                 SEND GENERATED SUFFIX
+            return  valuesPrefix[rand.Next(1,40)][0].ToString() + " " + valuesSuffix[rand.Next(1,40)][0].ToString();
         }
 
         /// <summary>
@@ -177,10 +194,10 @@ namespace MagicItemGen
             switch (suffixOrPrefix)
             {
                 case 0:
-                    range = $"{sheetPrefix}!A2:B21"; //FIRST COLUMN OF PREFIXES
+                    range = $"{sheetPrefixWeapon}!A2:B21"; //FIRST COLUMN OF PREFIXES
                     break;
                 case 1:
-                    range = $"{sheetSuffix}!A2:B21"; //FIRST COLUMN OF PREFIXES
+                    range = $"{sheetSuffixWeapon}!A2:B21"; //FIRST COLUMN OF PREFIXES
                     break;
             }
             var request = service.Spreadsheets.Values.Get(spreadsheetID, range);
