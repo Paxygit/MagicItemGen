@@ -13,7 +13,7 @@ Currently working locally for magic tier items, with no Roll20 Macro Integration
 
 -TODO: Rare item generation
 
--TODO: Randomized Number of Affixes
+xTODO: Randomized Number of Affixes DONE 5/6/20
 
 -TODO: Format posting nicely
 
