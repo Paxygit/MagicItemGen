@@ -17,14 +17,16 @@ namespace MagicItemGen
         static readonly string sheetSuffixWeapon = "Suffix List Weapon";
         static readonly string sheetPrefixArmor = "Prefix List Armor";
         static readonly string sheetSuffixArmor = "Suffix List Armor";
+        static string itemType = string.Empty;
         static readonly string sheetWeapType = "Weapon List";
+        static readonly string sheetArmorType = "Armor List";
+        static readonly string sheetJewelryType = "Jewelry List"; //INCLUDES BELTS
         static readonly string sheetDropRate = "DROPRATE TO CR";
         static readonly string fifthEditionWeaponCPDM = "https://roll20.net/compendium/dnd5e/Weapons#content";
         static private Random rand = new Random();
         #endregion
         public static string GetItem(int cr)
         {
-
             GoogleCredential credential; // credential gen from json
 
             using (var stream = new FileStream("ItemGen-c89894405329.json", FileMode.Open, FileAccess.Read))
@@ -46,19 +48,19 @@ namespace MagicItemGen
             var value = values[0]; // GEN THROUGH HERE
             #endregion
 
-            string[] weaponType = GetWeaponType();
+            string[] itemType = GetItemType();
             int[] rarity = dropRarity(value);
             switch (rarity[0])
             {
                 case 1: // MAGIC
-                    return GenerateMagic(rarity[1], Convert.ToInt32(value[0]), weaponType);                               
+                    return GenerateMagic(rarity[1], Convert.ToInt32(value[0]), itemType);                               
 
                 case 2: // RARE
-                    return GenerateRare(rarity[1], Convert.ToInt32(value[1]), weaponType);
+                    return GenerateRare(rarity[1], Convert.ToInt32(value[1]), itemType);
 
                 case 0: // NORMAL
                     Console.WriteLine("Normal");
-                    return "Normal " + weaponType[0];
+                    return "Normal " + itemType[0];
             }
             return "ERROR GENERATING ITEM RARITY";
         }
@@ -79,29 +81,55 @@ namespace MagicItemGen
             else {return new[] { 0, localRand };}//NORMAL
         }
 
-        private static string[] GetWeaponType()
+        private static string[] GetItemType()
         {
-            int weapArchetype = rand.Next(1, 4);
+            int itemRoll = rand.Next(1, 6); //CHANGE TO 7 FOR JEWELRY UPDATE ---------------- TODO
             var range = "";
             int n = 0;
-            switch (weapArchetype)
+            switch (itemRoll)
             {
                 case 1: //SIMPLE MELEE
                     range = $"{sheetWeapType}!A2:A11";
+                    itemType = "Weapon";
                     n = 10;
                     break;
+
                 case 2: //SIMPLE RANGED
                     range = $"{sheetWeapType}!B2:B5";
+                    itemType = "Weapon";
                     n = 4;
                     break;
+
                 case 3: //MARTIAL MELEE
                     range = $"{sheetWeapType}!C2:C19";
+                    itemType = "Weapon";
                     n = 18;
                     break;
+
                 case 4: //MARTIAL RANGED
-                    range = $"{sheetWeapType}!D2:D6";
-                    n = 5;
+                    range = $"{sheetWeapType}!D2:D10";
+                    itemType = "Weapon";
+                    n = 9;
                     break;
+
+                case 5: //ARMORS 
+                    range = $"{sheetArmorType}!A2:A14";
+                    itemType = "Armor";
+                    n = 13;
+                    break;
+
+                case 6: //ARMORS (DUPLICATE FOR BETTER DROPRATE)
+                    range = $"{sheetArmorType}!A2:A14";
+                    itemType = "Armor";
+                    n = 13;
+                    break;
+
+                case 7: //JEWELRY
+                    range = $"{sheetJewelryType}!A2:A5";
+                    itemType = "Jewelry";
+                    n = 4;
+                    break;
+
             }
 
             var request = service.Spreadsheets.Values.Get(spreadsheetID, range);
@@ -121,30 +149,30 @@ namespace MagicItemGen
 
 
         /// <summary>
-        /// 1-100 roll, upperBound is the limit at which the magic item roll threshold is, weaponType is the generated weaponType
+        /// 1-100 roll, upperBound is the limit at which the magic item roll threshold is, item is the generated item
         /// </summary>
         /// <param name="roll"></param>
         /// <param name="upperBound"></param>
-        /// <param name="weaponType"></param>
+        /// <param name="item"></param>
         /// <returns></returns>
-        private static string GenerateMagic(int roll, int upperBound, string[] weaponType)
+        private static string GenerateMagic(int roll, int upperBound, string[] item)
         {
-            string[] prefixOne = ReadAffix(rand.Next(0, 19), 0);
+            string[] prefixOne = ReadAffix(rand.Next(0, 19), 0); //EXPAND FOR ANY PREFIX OR SUFFIX ADDITION UPDATES
             string[] suffixOne = ReadAffix(rand.Next(0, 19), 1);
 
-            return prefixOne[0] + weaponType[0] + suffixOne[0] + "\n\n" +    // Prefix Weapon of Suffixing
+            return prefixOne[0] + item[0] + suffixOne[0] + "\n\n" +    // Prefix Weapon of Suffixing
               prefixOne[0] + ": " + prefixOne[1] + "\n\n" +                 //Prefix: Description
               suffixOne[0] + ": " + suffixOne[1] + "\n\n" +                //Suffix: Description
-              weaponType[1];                                              //Link to Roll20 Weapon Compendium
+              item[1];                                              //Link to Roll20 Weapon Compendium
         }
         /// <summary>
-        /// 1-100 roll, upperBound is the limit at which the rare item roll threshold is, weaponType is the generated weaponType
+        /// 1-100 roll, upperBound is the limit at which the rare item roll threshold is, item is the generated item
         /// </summary>
         /// <param name="roll"></param>
         /// <param name="upperBound"></param>
-        /// <param name="weaponType"></param>
+        /// <param name="item"></param>
         /// <returns></returns>
-        private static string GenerateRare(int roll, int upperBound, string[] weaponType)
+        private static string GenerateRare(int roll, int upperBound, string[] item)
         {
             string[] prefixOne = ReadAffix(rand.Next(0, 19), 0);
             string[] suffixOne = ReadAffix(rand.Next(0, 19), 1);
@@ -160,13 +188,13 @@ namespace MagicItemGen
                 
             }
             string rareNameAffixes = GenerateRareName();
-            string rareName = rareNameAffixes + weaponType[0] + "\n\n";
+            string rareName = rareNameAffixes + item[0] + "\n\n";
             rareName = rareName + prefixOne[0] + ": " + prefixOne[1] + "\n\n";
             if (prefixTwo[0] != "") { rareName = rareName + prefixTwo[0] + ": " + prefixTwo[1] + "\n\n"; }
             rareName = rareName + suffixOne[0] + ": " + suffixOne[1] + "\n\n";
             if (suffixTwo[0] != "") { rareName = rareName + suffixTwo[0] + ": " + suffixTwo[1] + "\n\n"; }
 
-            return rareName + weaponType[1];                                // + Link to Roll20 Weapon Compendium
+            return rareName + item[1];                                // + Link to Roll20 Weapon Compendium
         }
 
         private static string GenerateRareName()
@@ -188,18 +216,22 @@ namespace MagicItemGen
         /// <param name="n"></param>
         /// <param name="suffixOrPrefix"></param>
         /// <returns></returns>
-        private static string[] ReadAffix(int n, int suffixOrPrefix)
+        private static string[] ReadAffix(int n, int AffixType)
         {
             var range = "";
-            switch (suffixOrPrefix)
+            switch (itemType)
             {
-                case 0:
-                    range = $"{sheetPrefixWeapon}!A2:B21"; //FIRST COLUMN OF PREFIXES
+                case "Weapon":
+                    range = ReadType(AffixType, range, new[] { sheetPrefixWeapon, sheetSuffixWeapon}); 
                     break;
-                case 1:
-                    range = $"{sheetSuffixWeapon}!A2:B21"; //FIRST COLUMN OF PREFIXES
+                case "Armor":
+                    range = ReadType(AffixType, range, new[] { sheetPrefixArmor, sheetSuffixArmor });
                     break;
+               // case "Jewelry":
+                    //range = ReadType(AffixType, range, new[] { sheetPrefixWeapon, sheetSuffixWeapon }); JEWELRY UPDATE NOT YET IMPLEMENTED ------------------ TODO
+                   // break;
             }
+            
             var request = service.Spreadsheets.Values.Get(spreadsheetID, range);
             var values = request.Execute().Values; //USE FOR VALUES
             var value = values[n]; // GEN THROUGH HERE
@@ -213,6 +245,26 @@ namespace MagicItemGen
             }
 
         }
+        /// <summary>
+        /// Pass in AffixType, range to return, prefix at index 0 and suffix at index 1 to cast into range.
+        /// </summary>
+        /// <param name="AffixType"></param>
+        /// <param name="range"></param>
+        /// <param name="prefixSuffix"></param>
+        /// <returns></returns>
+        private static string ReadType(int AffixType, string range, string[] prefixSuffix)
+        {
+            switch (AffixType)
+            {
+                case 0:
+                    range = $"{prefixSuffix[0]}!A2:B21"; //FIRST COLUMN OF PREFIXES
+                    break;
+                case 1:
+                    range = $"{prefixSuffix[1]}!A2:B21"; //FIRST COLUMN OF SUFFIXES
+                    break;
+            }
 
+            return range;
+        }
     }
 }
