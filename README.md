@@ -11,11 +11,11 @@ Example:
 
 Currently working locally for magic tier items, with no Roll20 Macro Integration.
 
--TODO: Rare item generation DONE FOR WEAPONS 5/7/20
+-TODO: Rare item generation DONE FOR WEAPONS AND ARMOR 5/7/20, 5/12/20 (JEWELLRY SOON? JEWELS AFTER?)
 
 xTODO: Randomized Number of Affixes DONE 5/6/20
 
--TODO: Format posting nicely
+-TODO: Format posting nicely 
 
 -TODO: Roll20 Integration 
 
