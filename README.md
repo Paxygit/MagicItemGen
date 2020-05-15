@@ -11,7 +11,7 @@ Example:
 
 Currently working locally for magic tier items, with no Roll20 Macro Integration.
 
--TODO: Rare item generation DONE FOR WEAPONS AND ARMOR 5/7/20, 5/12/20 (JEWELLRY SOON? JEWELS AFTER?)
+-TODO: Rare item generation DONE FOR WEAPONS ARMOR AND JEWELRY 5/7/20, 5/12/20, 5/15/20 (TODO: JEWELS)
 
 xTODO: Randomized Number of Affixes DONE 5/6/20
 
@@ -24,3 +24,11 @@ xTODO: Randomized Number of Affixes DONE 5/6/20
 -TODO: Release prep
 
 -TODO: Release?
+
+
+NOTES FROM COMBAT TEST /w BETA TESTERS:
+
+- Disenchant system for bad items for crafting mats
+- Increase Magic Droprate
+- Misc. Items instead of Normal items
+- Implement ways to Add Mods - TODO
