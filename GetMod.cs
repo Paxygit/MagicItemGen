@@ -17,6 +17,10 @@ namespace MagicItemGen
         static readonly string sheetSuffixWeapon = "Suffix List Weapon";
         static readonly string sheetPrefixArmor = "Prefix List Armor";
         static readonly string sheetSuffixArmor = "Suffix List Armor";
+        static readonly string sheetPrefixJewelry = "Prefix List Jewelry";
+        static readonly string sheetSuffixJewelry = "Suffix List Jewelry";
+        static readonly string sheetPrefixPotion = "Prefix List Potion";
+        static readonly string sheetSuffixPotion = "Suffix List Potion";
         static string itemType = string.Empty;
         static readonly string sheetWeapType = "Weapon List";
         static readonly string sheetArmorType = "Armor List";
@@ -58,12 +62,13 @@ namespace MagicItemGen
                 case 2: // RARE
                     return GenerateRare(rarity[1], Convert.ToInt32(value[1]), itemType);
 
-                case 0: // NORMAL
-                    Console.WriteLine("Normal");
-                    return "Normal " + itemType[0];
+                case 0: //NO DROP
+                    return "\n\n\n\n"; //ADD LINES FOR FORMATTING, change in the future to rusted / broken items?
             }
             return "ERROR GENERATING ITEM RARITY";
         }
+
+        
 
         /// <summary>
         /// First is Switch index (0 for normal, 1 for magic, 2 for rare), second is the generated random number.
@@ -78,60 +83,57 @@ namespace MagicItemGen
 
             else if (localRand <= Convert.ToInt32(value[1])){return new[] { 2, localRand };}//RARE
 
-            else {return new[] { 0, localRand };}//NORMAL
+            else { return new[] { 0, localRand }; }//NO DROP LOL
         }
 
         private static string[] GetItemType()
         {
-            int itemRoll = rand.Next(1, 6); //CHANGE TO 7 FOR JEWELRY UPDATE ---------------- TODO
-            var range = "";
+            int itemRoll = rand.Next(1, 7); 
+            var range = string.Empty;
             int n = 0;
             switch (itemRoll)
             {
-                case 1: //SIMPLE MELEE
-                    range = $"{sheetWeapType}!A2:A11";
+                case 1: //SIMPLE MELEE OR RANGED
+                    itemRoll = rand.Next(1, 2);
+                    if (itemRoll == 1) { range = $"{sheetWeapType}!A2:A11"; n = 10; }
+                    else { range = $"{sheetWeapType}!B2:B5"; n = 4; }
                     itemType = "Weapon";
-                    n = 10;
                     break;
 
-                case 2: //SIMPLE RANGED
-                    range = $"{sheetWeapType}!B2:B5";
-                    itemType = "Weapon";
-                    n = 4;
-                    break;
-
-                case 3: //MARTIAL MELEE
+                case 2: //MARTIAL MELEE
                     range = $"{sheetWeapType}!C2:C19";
                     itemType = "Weapon";
                     n = 18;
                     break;
 
-                case 4: //MARTIAL RANGED
+                case 3: //MARTIAL RANGED
                     range = $"{sheetWeapType}!D2:D10";
                     itemType = "Weapon";
                     n = 9;
                     break;
 
-                case 5: //ARMORS 
+                case 4: //ARMORS 
                     range = $"{sheetArmorType}!A2:A14";
                     itemType = "Armor";
                     n = 13;
                     break;
 
-                case 6: //ARMORS (DUPLICATE FOR BETTER DROPRATE)
+                case 5: //ARMORS (DUPLICATE FOR BETTER DROPRATE)
                     range = $"{sheetArmorType}!A2:A14";
                     itemType = "Armor";
                     n = 13;
                     break;
 
-                case 7: //JEWELRY
+                case 6: //JEWELRY
                     range = $"{sheetJewelryType}!A2:A5";
                     itemType = "Jewelry";
                     n = 4;
                     break;
 
+                case 7: //POTION
+                    itemType = "Potion";
+                    return new[] { " " + itemType + " ", fifthEditionWeaponCPDM };
             }
-
             var request = service.Spreadsheets.Values.Get(spreadsheetID, range);
             var values = request.Execute().Values; //USE FOR VALUES
 
@@ -143,10 +145,8 @@ namespace MagicItemGen
                 default:
                     var value = values[rand.Next(0, n)]; // GEN THROUGH HERE
                     return new[] { " " + value[0].ToString() + " ", fifthEditionWeaponCPDM };
-            }
+            } //GENERATES WHAT TYPE OF ITEM IT IS
         }
-
-
 
         /// <summary>
         /// 1-100 roll, upperBound is the limit at which the magic item roll threshold is, item is the generated item
@@ -196,6 +196,18 @@ namespace MagicItemGen
 
             return rareName + item[1];                                // + Link to Roll20 Weapon Compendium
         }
+/*
+        private static string GeneratePotion(int roll, int upperBound, string[] item)
+        {
+            string[] prefixOne = ReadAffix(rand.Next(0, 12), 0);
+            string[] suffixOne = ReadAffix(rand.Next(0, 12), 1);                                        
+
+
+            return prefixOne[0] + item[0] + suffixOne[0] + "\n\n" +    // Prefix Weapon of Suffixing
+              prefixOne[0] + ": " + prefixOne[1] + "\n\n" +                 //Prefix: Description
+              suffixOne[0] + ": " + suffixOne[1] + "\n\n" +                //Suffix: Description
+              item[1];                                              //Link to Roll20 Weapon Compendium
+        } */ //DEPRECATED GENERATE POTION FUNCTION, POTIONS NOW ON NORMAL DROP TABLES
 
         private static string GenerateRareName()
         {
@@ -222,14 +234,21 @@ namespace MagicItemGen
             switch (itemType)
             {
                 case "Weapon":
-                    range = ReadType(AffixType, range, new[] { sheetPrefixWeapon, sheetSuffixWeapon}); 
+                    range = ReadType(AffixType, new[] { sheetPrefixWeapon, sheetSuffixWeapon}); 
                     break;
+
                 case "Armor":
-                    range = ReadType(AffixType, range, new[] { sheetPrefixArmor, sheetSuffixArmor });
+                    range = ReadType(AffixType, new[] { sheetPrefixArmor, sheetSuffixArmor });
                     break;
-               // case "Jewelry":
-                    //range = ReadType(AffixType, range, new[] { sheetPrefixWeapon, sheetSuffixWeapon }); JEWELRY UPDATE NOT YET IMPLEMENTED ------------------ TODO
-                   // break;
+
+                case "Jewelry":
+                    range = ReadType(AffixType, new[] { sheetPrefixJewelry, sheetSuffixJewelry }); 
+                    break;
+
+                case "Potion":
+                    range = ReadType(AffixType, new[] { sheetPrefixPotion, sheetSuffixPotion });
+                    n = rand.Next(0, 12);
+                    break;
             }
             
             var request = service.Spreadsheets.Values.Get(spreadsheetID, range);
@@ -238,7 +257,7 @@ namespace MagicItemGen
             switch (values.Count)
             {
                 case 0:
-                    return new[] { "Error Generating Prefix" };
+                    return new[] { "Error Generating Affix" };
 
                 default:          //Affix at generated line | Description
                     return new[] { value[0].ToString() + " ", value[1].ToString() + " " };
@@ -252,19 +271,20 @@ namespace MagicItemGen
         /// <param name="range"></param>
         /// <param name="prefixSuffix"></param>
         /// <returns></returns>
-        private static string ReadType(int AffixType, string range, string[] prefixSuffix)
+        private static string ReadType(int AffixType, string[] prefixSuffix)
         {
-            switch (AffixType)
+            string cellRange = string.Empty;
+            if (prefixSuffix[0] == sheetPrefixPotion) { cellRange = "A2:B13"; } //LESS AFFIXES FOR POTIONS
+            else { cellRange = "A2:B21"; } //IF NOT A POTION
+
+                switch (AffixType)
             {
                 case 0:
-                    range = $"{prefixSuffix[0]}!A2:B21"; //FIRST COLUMN OF PREFIXES
-                    break;
+                    return $"{prefixSuffix[0]}!{cellRange}"; //FIRST COLUMN OF PREFIXES
                 case 1:
-                    range = $"{prefixSuffix[1]}!A2:B21"; //FIRST COLUMN OF SUFFIXES
-                    break;
+                    return $"{prefixSuffix[1]}!{cellRange}"; //FIRST COLUMN OF SUFFIXES
             }
-
-            return range;
+            return "ERROR";
         }
     }
 }
