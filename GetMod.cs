@@ -26,7 +26,8 @@ namespace MagicItemGen
         static readonly string sheetArmorType = "Armor List";
         static readonly string sheetJewelryType = "Jewelry List"; //INCLUDES BELTS
         static readonly string sheetDropRate = "DROPRATE TO CR";
-        static readonly string fifthEditionWeaponCPDM = "https://roll20.net/compendium/dnd5e/Weapons#content";
+        static readonly string fifthEditionWeaponCPDM = "https://roll20.net/compendium/dnd5e/Weapons#content"; 
+        static readonly string fifthEditionArmorCPDM = "https://roll20.net/compendium/dnd5e/Armor#content";
         static private Random rand = new Random();
         #endregion
         public static string GetItem(int cr)
@@ -45,7 +46,10 @@ namespace MagicItemGen
                 ApplicationName = appName,
             }); //run api service
 
-            #region Rarity Stuff
+            #region Rarity Declarations
+            cr++; //+1 DUE TO TITLE IN GOOGLE SHEET TABLE
+            if (cr <= 1)  { return "Error: CR entered was below 1!";} //bad input handle
+
             var range = $"{sheetDropRate}!A{cr}:B{cr}";
             var request = service.Spreadsheets.Values.Get(spreadsheetID, range);
             var values = request.Execute().Values; //USE FOR VALUES
@@ -57,14 +61,14 @@ namespace MagicItemGen
             switch (rarity[0])
             {
                 case 1: // MAGIC
-                    return GenerateMagic(rarity[1], Convert.ToInt32(value[0]), itemType);                               
+                    return GenerateMagic(rarity[1], Convert.ToInt32(value[0]), itemType) + "\nMAGIC";                               
 
                 case 2: // RARE
-                    return GenerateRare(rarity[1], Convert.ToInt32(value[1]), itemType);
+                    return GenerateRare(rarity[1], Convert.ToInt32(value[1]), itemType) + "\nRARE";
 
                 case 0: //NO DROP
-                    return "\n\n\n\n"; //ADD LINES FOR FORMATTING, change in the future to rusted / broken items?
-            }
+                    return "\n\n\n\n" + "NONE"; //ADD LINES FOR FORMATTING
+            } //read dropRarity output
             return "ERROR GENERATING ITEM RARITY";
         }
 
@@ -91,6 +95,7 @@ namespace MagicItemGen
             int itemRoll = rand.Next(1, 7); 
             var range = string.Empty;
             int n = 0;
+            string localLink = string.Empty;
             switch (itemRoll)
             {
                 case 1: //SIMPLE MELEE OR RANGED
@@ -98,30 +103,35 @@ namespace MagicItemGen
                     if (itemRoll == 1) { range = $"{sheetWeapType}!A2:A11"; n = 10; }
                     else { range = $"{sheetWeapType}!B2:B5"; n = 4; }
                     itemType = "Weapon";
+                    localLink = fifthEditionWeaponCPDM;
                     break;
 
                 case 2: //MARTIAL MELEE
                     range = $"{sheetWeapType}!C2:C19";
                     itemType = "Weapon";
                     n = 18;
+                    localLink = fifthEditionWeaponCPDM;
                     break;
 
                 case 3: //MARTIAL RANGED
                     range = $"{sheetWeapType}!D2:D10";
                     itemType = "Weapon";
                     n = 9;
+                    localLink = fifthEditionWeaponCPDM;
                     break;
 
                 case 4: //ARMORS 
                     range = $"{sheetArmorType}!A2:A14";
                     itemType = "Armor";
                     n = 13;
+                    localLink = fifthEditionArmorCPDM;
                     break;
 
                 case 5: //ARMORS (DUPLICATE FOR BETTER DROPRATE)
                     range = $"{sheetArmorType}!A2:A14";
                     itemType = "Armor";
                     n = 13;
+                    localLink = fifthEditionArmorCPDM;
                     break;
 
                 case 6: //JEWELRY
@@ -132,10 +142,10 @@ namespace MagicItemGen
 
                 case 7: //POTION
                     itemType = "Potion";
-                    return new[] { " " + itemType + " ", fifthEditionWeaponCPDM };
+                    return new[] { " " + itemType + " ", localLink };
             }
             var request = service.Spreadsheets.Values.Get(spreadsheetID, range);
-            var values = request.Execute().Values; //USE FOR VALUES
+             var values = request.Execute().Values; //USE FOR VALUES
 
             switch (values.Count)
             {
@@ -144,7 +154,7 @@ namespace MagicItemGen
 
                 default:
                     var value = values[rand.Next(0, n)]; // GEN THROUGH HERE
-                    return new[] { " " + value[0].ToString() + " ", fifthEditionWeaponCPDM };
+                    return new[] { " " + value[0].ToString() + " ", localLink };
             } //GENERATES WHAT TYPE OF ITEM IT IS
         }
 
