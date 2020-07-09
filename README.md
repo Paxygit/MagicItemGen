@@ -24,3 +24,7 @@ Currently working locally, Roll20 API Requires A Subscription
 This Project has concluded.
 
 Undoubtedly more work could be done to improve the presentation of the program. Speed could also be improved by implementing our Google Sheet API into a Hard-Coded format, but that was not the Goal of utilizing the Google API. This was a fun project and a good introduction to Google API implementation, and has been great when used for my D&D sessions.
+
+Prefixes and Suffixes list:
+https://docs.google.com/spreadsheets/d/1g7hTUbNkulh-Z63PMEo1-lR4B0Kw-rKX9uC54iGSVFw/edit?usp=sharing
+This is the last thing that may be subject to change.
