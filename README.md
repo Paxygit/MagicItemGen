@@ -18,26 +18,9 @@ Rare Example:
             of Health: While wielding this weapon, you may regain your hit die in health at the end of combat.
             of  Rigamortis: On a natural roll of 15 or higher,  the attacked enemy has vulnerability to Necrotic Damage.
 
-Currently working locally, with no Roll20 Macro Integration.
 
--TODO: Rare item generation DONE FOR WEAPONS ARMOR AND JEWELRY AND POTIONS 5/7/20, 5/12/20, 5/15/20, 5/18/20 (TODO: JEWELS)
+Currently working locally, Roll20 API Requires A Subscription
 
-xTODO: Randomized Number of Affixes DONE 5/6/20
+This Project has concluded.
 
--TODO: Format posting nicely 
-
--TODO: Roll20 Integration 
-
--TODO: Icons, Art
-
--TODO: Release prep
-
--TODO: Release?
-
-
-NOTES FROM COMBAT TEST /w BETA TESTERS:
-
-- Increase Magic Droprate - TODO NEXT
-- Misc. Items instead of Normal items - DONE 5/18/20 with Potion Update
-- Implement ways to Add Mods - TODO
-- Disenchant system for bad items for crafting mats
+Undoubtedly more work could be done to improve the presentation of the program. Speed could also be improved by implementing our Google Sheet API into a Hard-Coded format, but that was not the Goal of utilizing the Google API. This was a fun project and a good introduction to Google API implementation, and has been great when used for my D&D sessions.
